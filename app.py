@@ -19,7 +19,7 @@ def save_button_press():
     save_button['state'] = tk.DISABLED
     print("SAVE")
 
-root = tk.Tk()
+root = tk.Tk(className='timelogtk')
 root.geometry('340x490')
 root.resizable(False, False)
 root.title('Timelog')

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Terminal=false
+Name=Timelog
+Exec=python3 /home/eric/repos/timelog/app.py
+Icon=/home/eric/repos/timelog/logo.png
+StartupWMClass=timelogtk
