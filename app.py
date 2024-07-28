@@ -4,7 +4,6 @@ from time import strftime
 from tkinter.ttk import Style
 from PIL import Image, ImageTk
 
-
 def time():
     system_time = strftime('%H:%M:%S')
     time_label.config(text=system_time)
@@ -19,10 +18,12 @@ def save_button_press():
     save_button['state'] = tk.DISABLED
     print("SAVE")
 
+version = 'v1'
+
 root = tk.Tk(className='timelogtk')
 root.geometry('340x490')
 root.resizable(False, False)
-root.title('Timelog')
+root.title('Timelog ' + version)
 root.configure(background='white')
 
 frame_style = Style()
