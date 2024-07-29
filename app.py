@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter.ttk import Style
 from PIL import Image, ImageTk
 import time
+import configparser
 
 class Timelog:
 
@@ -31,6 +32,7 @@ class Timelog:
         self.save_button['state'] = tk.DISABLED
         time_diff = self.total_elapsed_time - self.last_saved_time # time to add to file
         # Do save operation here
+        print(self.file)
         self.last_saved_time = self.total_elapsed_time
 
     def __init__(self):
@@ -72,6 +74,10 @@ class Timelog:
         self.save_button = ttk.Button(self.frame, text='Save', command=self.handler_save_button_press)
         self.save_button.grid(column=0, row=3, pady=(70,0))
         self.save_button['state'] = tk.DISABLED
+
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+        self.file = config.get('File', 'Location')
 
     def Start(self):
         self.root.mainloop()
