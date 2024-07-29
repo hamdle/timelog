@@ -6,35 +6,6 @@ import time
 import configparser
 
 class Timelog:
-
-    def update_time(self):
-        if self.timer_on == 0:
-            return;
-        self.save_button['state'] = tk.NORMAL
-        self.elapsed_time = time.time() - self.start_time
-        self.time_label.config(text=time.strftime('%H:%M:%S',time.gmtime(self.total_elapsed_time + self.elapsed_time)))
-        self.time_label.after(1000, self.update_time)
-
-    def handler_start_button_press(self):
-        if self.start_button['text'] == 'Start':
-            # Start button pressed
-            self.timer_on = 1
-            self.start_button['text'] = 'Stop'
-            self.start_time = time.time()
-            self.update_time()
-        else:
-            # Stop button pressed
-            self.timer_on = 0
-            self.start_button['text'] = 'Start'
-            self.total_elapsed_time += self.elapsed_time
-
-    def handler_save_button_press(self):
-        self.save_button['state'] = tk.DISABLED
-        time_diff = self.total_elapsed_time - self.last_saved_time # time to add to file
-        # Do save operation here
-        print(self.file)
-        self.last_saved_time = self.total_elapsed_time
-
     def __init__(self):
         self.version = 'v1'
 
@@ -78,6 +49,34 @@ class Timelog:
         config = configparser.ConfigParser()
         config.read('config.ini')
         self.file = config.get('File', 'Location')
+
+    def update_time(self):
+        if self.timer_on == 0:
+            return;
+        self.save_button['state'] = tk.NORMAL
+        self.elapsed_time = time.time() - self.start_time
+        self.time_label.config(text=time.strftime('%H:%M:%S',time.gmtime(self.total_elapsed_time + self.elapsed_time)))
+        self.time_label.after(1000, self.update_time)
+
+    def handler_start_button_press(self):
+        if self.start_button['text'] == 'Start':
+            # Start button pressed
+            self.timer_on = 1
+            self.start_button['text'] = 'Stop'
+            self.start_time = time.time()
+            self.update_time()
+        else:
+            # Stop button pressed
+            self.timer_on = 0
+            self.start_button['text'] = 'Start'
+            self.total_elapsed_time += self.elapsed_time
+
+    def handler_save_button_press(self):
+        self.save_button['state'] = tk.DISABLED
+        time_diff = self.total_elapsed_time - self.last_saved_time # time to add to file
+        # Do save operation here
+        print(self.file)
+        self.last_saved_time = self.total_elapsed_time
 
     def Start(self):
         self.root.mainloop()
