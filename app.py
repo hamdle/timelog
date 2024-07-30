@@ -47,6 +47,10 @@ class Timelog:
         self.save_button.grid(column=0, row=3, pady=(70,0))
         self.save_button['state'] = tk.DISABLED
 
+        self.saved_time_label = ttk.Label(self.frame, font=('calibri', 13), background='white', foreground='green')
+        self.saved_time_label.grid(column=0, row=4, pady=(5,0))
+        self.saved_time_label.config(text="")
+
         config = configparser.ConfigParser()
         config.read('config.ini')
         self.file = config.get('File', 'Location')
@@ -112,6 +116,9 @@ class Timelog:
 
             with open(self.file, 'a') as f:
                 f.write(self.file_lines[-1])
+
+        self.saved_time_label.config(text="+" + time.strftime('%H:%M:%S',time.gmtime(seconds_to_add)))
+        self.saved_time_label.after(3000, lambda: self.saved_time_label.config(text=""))
 
     def Start(self):
         self.root.mainloop()
