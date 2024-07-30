@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter.ttk import Style
 from PIL import Image, ImageTk
 import time
+import datetime
 import configparser
 
 class Timelog:
@@ -49,13 +50,14 @@ class Timelog:
         config = configparser.ConfigParser()
         config.read('config.ini')
         self.file = config.get('File', 'Location')
+        self.file_lines = []
 
     def update_time(self):
         if self.timer_on == 0:
             return;
         self.save_button['state'] = tk.NORMAL
         self.elapsed_time = time.time() - self.start_time
-        self.time_label.config(text=time.strftime('%H:%M:%S',time.gmtime(self.total_elapsed_time + self.elapsed_time)))
+        self.time_label.config(text=time.strftime('%H:%M:%S', time.gmtime(self.total_elapsed_time + self.elapsed_time)))
         self.time_label.after(1000, self.update_time)
 
     def handler_start_button_press(self):
@@ -74,9 +76,42 @@ class Timelog:
     def handler_save_button_press(self):
         self.save_button['state'] = tk.DISABLED
         time_diff = self.total_elapsed_time - self.last_saved_time # time to add to file
-        # Do save operation here
-        print(self.file)
+        self.save_file(time_diff)
         self.last_saved_time = self.total_elapsed_time
+
+    def save_file(self, seconds_to_add):
+        with open(self.file) as f:
+            for line in f:
+                self.file_lines.append(line)
+
+        parts = self.file_lines[-1].split(',')
+        date_part = parts[0]
+        time_part = parts[1].strip()
+
+        file_dt = datetime.datetime.strptime(date_part, "%m/%d/%Y")
+        now_dt = datetime.datetime.now()
+
+        if file_dt.date() == now_dt.date():
+            # modify last line, overwrite file
+            entry = []
+            entry.append(now_dt.strftime('%m/%d/%Y'))
+            time_part_parts = time_part.split(':')
+            time_part_in_seconds = datetime.timedelta(hours=int(time_part_parts[0]), minutes=int(time_part_parts[1]), seconds=int(time_part_parts[2]))
+            entry.append(time.strftime('%H:%M:%S', time.gmtime(seconds_to_add + time_part_in_seconds.total_seconds())))
+            self.file_lines[-1] = entry[0] + ", " + entry[1] + "\n"
+
+            with open(self.file, 'a') as f:
+                for line in self.file_lines:
+                    f.write(line)
+        else:
+            # append new line to end of file
+            entry = []
+            entry.append(now_dt.strftime('%m/%d/%Y'))
+            entry.append(time.strftime('%H:%M:%S',time.gmtime(seconds_to_add)))
+            self.file_lines.append(entry[0] + ", " + entry[1] + "\n")
+
+            with open(self.file, 'a') as f:
+                f.write(self.file_lines[-1])
 
     def Start(self):
         self.root.mainloop()
