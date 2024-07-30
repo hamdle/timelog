@@ -11,10 +11,9 @@ class Timelog:
         self.version = 'v1'
 
         self.timer_on = 0
-
         self.start_time = 0
-        self.elapsed_time = 0
-        self.total_elapsed_time = 0
+        self.elapsed_time = 0           # elapsed time since Start button pressed
+        self.total_elapsed_time = 0     # total elapsed time of all Start/Stop cycles
         self.last_saved_time = 0
 
         self.root = tk.Tk(className='timelogtk')
@@ -79,8 +78,7 @@ class Timelog:
 
     def handler_save_button_press(self):
         self.save_button['state'] = tk.DISABLED
-        time_diff = self.total_elapsed_time - self.last_saved_time # time to add to file
-        self.save_file(time_diff)
+        self.save_file(self.total_elapsed_time - self.last_saved_time)
         self.last_saved_time = self.total_elapsed_time
 
     def save_file(self, seconds_to_add):
