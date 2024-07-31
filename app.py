@@ -8,7 +8,7 @@ import configparser
 
 class Timelog:
     def __init__(self):
-        self.version = 'v1'
+        self.version = '1.0'
 
         self.timer_on = 0
         self.start_time = 0
@@ -20,7 +20,7 @@ class Timelog:
         self.root = tk.Tk(className='timelogtk')
         self.root.geometry('310x450')
         self.root.resizable(False, False)
-        self.root.title('Timelog ' + self.version)
+        self.root.title('Timelog')
         self.root.configure(background='white')
 
         self.frame_style = Style()
