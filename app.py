@@ -35,7 +35,7 @@ class Timelog:
         self.logo_label = ttk.Label(self.frame, image=self.logo_photo)
         self.logo_label.grid(column=0, row=0, pady=(40,0))
 
-        self.time_label = ttk.Label(self.frame, font=('Arial', 45), background='white')
+        self.time_label = ttk.Label(self.frame, font=('Arial', 38), background='white')
         self.time_label.grid(column=0, row=1, pady=(40,0))
         self.time_label.config(text=time.strftime('%H:%M:%S',time.gmtime(self.start_time)))
 
