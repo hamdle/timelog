@@ -16,6 +16,7 @@ class Timelog:
         self.total_elapsed_time = 0     # total elapsed time of all Start/Stop cycles
         self.last_saved_time = 0
 
+
         self.root = tk.Tk(className='timelogtk')
         self.root.geometry('310x450')
         self.root.resizable(False, False)
@@ -63,6 +64,8 @@ class Timelog:
         config.read('config.ini')
         self.file = config.get('File', 'Location')
         self.file_lines = []
+
+        self.root.tk.call('tk', 'scaling', 1.0)
 
     def update_time(self):
         if self.timer_on == 0:
