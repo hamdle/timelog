@@ -70,7 +70,8 @@ class Timelog:
     def update_time(self):
         if self.timer_on == 0:
             return;
-        self.save_button['state'] = tk.NORMAL
+        if str(self.save_button['state']) == tk.DISABLED:
+            self.save_button['state'] = tk.NORMAL
         self.elapsed_time = time.time() - self.start_time
         self.time_label.config(text=time.strftime('%H:%M:%S', time.gmtime(self.total_elapsed_time + self.elapsed_time)))
         self.time_label.after(1000, self.update_time)
