@@ -35,14 +35,14 @@ class Timelog:
         self.logo_label = ttk.Label(self.frame, image=self.logo_photo)
         self.logo_label.grid(column=0, row=0, pady=(40,0))
 
-        self.time_label = ttk.Label(self.frame, font=('calibri', 45), background='white')
+        self.time_label = ttk.Label(self.frame, font=('system', 45), background='white')
         self.time_label.grid(column=0, row=1, pady=(40,0))
         self.time_label.config(text=time.strftime('%H:%M:%S',time.gmtime(self.start_time)))
 
         self.start_button = ttk.Button(self.frame, text='Start', command=self.handler_start_button_press, width=12)
         self.start_button.grid(column=0, row=2, pady=(12,0))
 
-        self.saved_time_label = ttk.Label(self.frame, font=('calibri', 18), background='white', foreground='#0ac50a')
+        self.saved_time_label = ttk.Label(self.frame, font=('system', 18), background='white', foreground='#0ac50a')
         self.saved_time_label.grid(column=0, row=3, pady=(36, 0))
         self.saved_time_label.config(text="")
 
