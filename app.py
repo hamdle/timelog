@@ -87,7 +87,11 @@ class Timelog:
 
     def handler_save_button_press(self):
         self.save_button['state'] = tk.DISABLED
+        if self.timer_on == 1:
+            self.total_elapsed_time += self.elapsed_time
         self.save_file(self.total_elapsed_time - self.last_saved_time)
+        self.elapsed_time = 0
+        self.start_time = time.time()
         self.last_saved_time = self.total_elapsed_time
 
     # def handler_upload_button_press(self):
