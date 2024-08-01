@@ -11,7 +11,6 @@ class Timelog:
         self.version = '1.0'
 
         self.timer_on = 0
-        self.start_time = 0
         self.elapsed_time = 0           # elapsed time since Start button pressed
         self.total_elapsed_time = 0     # total elapsed time of all Start/Stop cycles
         self.last_saved_time = 0
@@ -38,7 +37,7 @@ class Timelog:
 
         self.time_label = ttk.Label(self.frame, font=('Arial', 38), background='white')
         self.time_label.grid(column=0, row=1, pady=(40,0))
-        self.time_label.config(text=time.strftime('%H:%M:%S',time.gmtime(self.start_time)))
+        self.time_label.config(text=time.strftime('%H:%M:%S',time.gmtime(0)))
 
         self.start_button = ttk.Button(self.frame, text='Start', command=self.handler_start_button_press, width=12)
         self.start_button.grid(column=0, row=2, pady=(12,0))
@@ -67,12 +66,13 @@ class Timelog:
 
         self.root.tk.call('tk', 'scaling', 1.0)
 
-    def update_time(self):
+    def update_time(self, wait = False):
         if self.timer_on == 0:
             return;
         if str(self.save_button['state']) == tk.DISABLED:
             self.save_button['state'] = tk.NORMAL
-        self.elapsed_time = time.time() - self.start_time
+        if wait == False:
+            self.elapsed_time += 1
         self.time_label.config(text=time.strftime('%H:%M:%S', time.gmtime(self.total_elapsed_time + self.elapsed_time)))
         self.time_label.after(1000, self.update_time)
 
@@ -81,13 +81,13 @@ class Timelog:
             # Start button pressed
             self.timer_on = 1
             self.start_button['text'] = 'Pause'
-            self.start_time = time.time()
-            self.update_time()
+            self.update_time(True)
         else:
             # Stop button pressed
             self.timer_on = 0
             self.start_button['text'] = 'Start'
             self.total_elapsed_time += self.elapsed_time
+            self.elapsed_time = 0
 
     def handler_save_button_press(self):
         self.save_button['state'] = tk.DISABLED
@@ -95,7 +95,6 @@ class Timelog:
             self.total_elapsed_time += self.elapsed_time
         self.save_file(self.total_elapsed_time - self.last_saved_time)
         self.elapsed_time = 0
-        self.start_time = time.time()
         self.last_saved_time = self.total_elapsed_time
 
     # def handler_upload_button_press(self):
