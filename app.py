@@ -10,7 +10,7 @@ class Timelog:
     def __init__(self):
         self.version = '1.0'
 
-        self.timer_on = 0
+        self.timer_on = False
         self.elapsed_time = 0           # elapsed time since Start button pressed
         self.total_elapsed_time = 0     # total elapsed time of all Start/Stop cycles
         self.last_saved_time = 0
@@ -67,7 +67,7 @@ class Timelog:
         self.root.tk.call('tk', 'scaling', 1.0)
 
     def update_time(self, wait = False):
-        if self.timer_on == 0:
+        if self.timer_on == False:
             return;
         if str(self.save_button['state']) == tk.DISABLED:
             self.save_button['state'] = tk.NORMAL
@@ -79,19 +79,19 @@ class Timelog:
     def handler_start_button_press(self):
         if self.start_button['text'] == 'Start':
             # Start button pressed
-            self.timer_on = 1
+            self.timer_on = True
             self.start_button['text'] = 'Pause'
             self.update_time(True)
         else:
             # Stop button pressed
-            self.timer_on = 0
+            self.timer_on = False
             self.start_button['text'] = 'Start'
             self.total_elapsed_time += self.elapsed_time
             self.elapsed_time = 0
 
     def handler_save_button_press(self):
         self.save_button['state'] = tk.DISABLED
-        if self.timer_on == 1:
+        if self.timer_on == True:
             self.total_elapsed_time += self.elapsed_time
         self.save_file(self.total_elapsed_time - self.last_saved_time)
         self.elapsed_time = 0
