@@ -18,7 +18,7 @@ class Timelog:
 
 
         self.root = tk.Tk(className='timelogtk')
-        self.root.geometry('310x450')
+        self.root.geometry('300x430')
         self.root.resizable(False, False)
         self.root.title('Timelog')
         self.root.configure(background='white')
