@@ -34,21 +34,21 @@ class Timelog:
         self.logo = self.logo.resize((50,50))
         self.logo_photo = ImageTk.PhotoImage(self.logo)
         self.logo_label = ttk.Label(self.frame, image=self.logo_photo)
-        self.logo_label.grid(column=0, row=0, pady=(40,0))
+        self.logo_label.grid(column=0, row=0, pady=(50,0))
 
         self.time_label = ttk.Label(self.frame, font=('Arial', 38), background='white')
-        self.time_label.grid(column=0, row=1, pady=(40,0))
+        self.time_label.grid(column=0, row=2, pady=(0,0))
         self.time_label.config(text=time.strftime('%H:%M:%S',time.gmtime(0)))
 
-        self.start_button = ttk.Button(self.frame, text='Start', command=self.handler_start_button_press, width=12)
-        self.start_button.grid(column=0, row=2, pady=(12,0))
+        self.start_button = ttk.Button(self.frame, text='Start', command=self.handler_start_button_press)
+        self.start_button.grid(column=0, row=3, pady=(12,0))
 
-        self.saved_time_label = ttk.Label(self.frame, font=('Arial', 24), background='white', foreground='#0ac50a')
-        self.saved_time_label.grid(column=0, row=3, pady=(20, 0))
+        self.saved_time_label = ttk.Label(self.frame, font=('Arial', 18), background='white', foreground='#0ac50a')
+        self.saved_time_label.grid(column=0, row=1, pady=(20, 0))
         self.saved_time_label.config(text="")
 
         self.save_button = ttk.Button(self.frame, text='Save', command=self.handler_save_button_press)
-        self.save_button.grid(column=0, row=4, pady=(16,0), padx=(0,0))
+        self.save_button.grid(column=0, row=4, pady=(12,0), padx=(0,0))
         # self.save_button.grid(column=0, row=4, pady=(27,0), padx=(30,0))
         self.save_button['state'] = tk.DISABLED
 
@@ -56,7 +56,7 @@ class Timelog:
         self.upload = self.upload.resize((19, 19))
         self.upload_image = ImageTk.PhotoImage(self.upload)
         self.upload_button = ttk.Button(self.frame, image=self.upload_image, command=self.handler_confirm_upload)
-        self.upload_button.grid(column=0, row=5, pady=(22, 0), padx=(0,0))
+        self.upload_button.grid(column=0, row=5, pady=(12, 0), padx=(0,0))
         #self.upload_button['state'] = tk.DISABLED
         self.upload_in_progress = 0
 
