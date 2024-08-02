@@ -98,12 +98,12 @@ class Timelog:
             self.timer_on = True
             self.start_button['text'] = 'Pause'
             self.start_time = time.time()
-            self.inter = setInterval(1.0,self.update_action)
+            self.interval = setInterval(1.0, self.update_action)
         else:
             # Stop button pressed
             self.timer_on = False
-            t=threading.Timer(0,self.inter.cancel)
-            t.start()
+            thread = threading.Timer(0, self.interval.cancel)
+            thread.start()
             self.start_button['text'] = 'Start'
             self.total_elapsed_time = self.elapsed_time
 
