@@ -3,9 +3,27 @@ from tkinter import ttk
 from tkinter.ttk import Style
 from PIL import Image, ImageTk
 import time
+import threading
 import datetime
 import configparser
 from tkinter.messagebox import askyesno
+
+class setInterval :
+    def __init__(self, interval, action) :
+        self.interval = interval
+        self.action = action
+        self.event = threading.Event()
+        thread = threading.Thread(target=self.__setInterval)
+        thread.start()
+
+    def __setInterval(self) :
+        nextTime = time.time() + self.interval
+        while not self.event.wait(nextTime - time.time()):
+            nextTime += self.interval
+            self.action()
+
+    def cancel(self) :
+        self.event.set()
 
 class Timelog:
     def __init__(self):
@@ -15,6 +33,7 @@ class Timelog:
         self.elapsed_time = 0           # elapsed time since Start button pressed
         self.total_elapsed_time = 0     # total elapsed time of all Start/Stop cycles
         self.last_saved_time = 0
+        self.start_time = time.time()
 
 
         self.root = tk.Tk(className='timelogtk')
@@ -34,21 +53,21 @@ class Timelog:
         self.logo = self.logo.resize((50,50))
         self.logo_photo = ImageTk.PhotoImage(self.logo)
         self.logo_label = ttk.Label(self.frame, image=self.logo_photo)
-        self.logo_label.grid(column=0, row=0, pady=(50,0))
+        self.logo_label.grid(column=0, row=0, pady=(30,0))
 
         self.time_label = ttk.Label(self.frame, font=('Arial', 38), background='white')
-        self.time_label.grid(column=0, row=2, pady=(0,0))
+        self.time_label.grid(column=0, row=1, pady=(30,0))
         self.time_label.config(text=time.strftime('%H:%M:%S',time.gmtime(0)))
 
         self.start_button = ttk.Button(self.frame, text='Start', command=self.handler_start_button_press)
-        self.start_button.grid(column=0, row=3, pady=(12,0))
+        self.start_button.grid(column=0, row=2, pady=(12,0))
 
         self.saved_time_label = ttk.Label(self.frame, font=('Arial', 18), background='white', foreground='#0ac50a')
-        self.saved_time_label.grid(column=0, row=1, pady=(20, 0))
+        self.saved_time_label.grid(column=0, row=4, pady=(16, 0), padx=(0, 5))
         self.saved_time_label.config(text="")
 
         self.save_button = ttk.Button(self.frame, text='Save', command=self.handler_save_button_press)
-        self.save_button.grid(column=0, row=4, pady=(12,0), padx=(0,0))
+        self.save_button.grid(column=0, row=3, pady=(12,0), padx=(0,0))
         # self.save_button.grid(column=0, row=4, pady=(27,0), padx=(30,0))
         self.save_button['state'] = tk.DISABLED
 
@@ -56,7 +75,7 @@ class Timelog:
         self.upload = self.upload.resize((19, 19))
         self.upload_image = ImageTk.PhotoImage(self.upload)
         self.upload_button = ttk.Button(self.frame, image=self.upload_image, command=self.handler_confirm_upload)
-        self.upload_button.grid(column=0, row=5, pady=(12, 0), padx=(0,0))
+        self.upload_button.grid(column=0, row=5, pady=(40, 0), padx=(0,0))
         #self.upload_button['state'] = tk.DISABLED
         self.upload_in_progress = 0
 
@@ -67,36 +86,35 @@ class Timelog:
 
         self.root.tk.call('tk', 'scaling', 1.0)
 
-    def update_time(self, wait = False):
-        if self.timer_on == False:
-            return;
+    def update_action(self, wait = False):
         if str(self.save_button['state']) == tk.DISABLED:
             self.save_button['state'] = tk.NORMAL
-        if wait == False:
-            self.elapsed_time += 1
-        self.time_label.config(text=time.strftime('%H:%M:%S', time.gmtime(self.total_elapsed_time + self.elapsed_time)))
-        self.time_label.after(1000, self.update_time)
+        self.elapsed_time = time.time() - self.start_time + self.total_elapsed_time
+        self.time_label.config(text=time.strftime('%H:%M:%S', time.gmtime(self.elapsed_time)))
 
     def handler_start_button_press(self):
         if self.start_button['text'] == 'Start':
             # Start button pressed
             self.timer_on = True
             self.start_button['text'] = 'Pause'
-            self.update_time(True)
+            self.start_time = time.time()
+            self.inter = setInterval(1.0,self.update_action)
         else:
             # Stop button pressed
             self.timer_on = False
+            t=threading.Timer(0,self.inter.cancel)
+            t.start()
             self.start_button['text'] = 'Start'
-            self.total_elapsed_time += self.elapsed_time
-            self.elapsed_time = 0
+            self.total_elapsed_time = self.elapsed_time
 
     def handler_save_button_press(self):
         self.save_button['state'] = tk.DISABLED
+        if self.timer_on == False:
+            self.save_file(self.total_elapsed_time - self.last_saved_time)
+            self.last_saved_time = self.total_elapsed_time
         if self.timer_on == True:
-            self.total_elapsed_time += self.elapsed_time
-        self.save_file(self.total_elapsed_time - self.last_saved_time)
-        self.elapsed_time = 0
-        self.last_saved_time = self.total_elapsed_time
+            self.save_file(self.elapsed_time - self.last_saved_time)
+            self.last_saved_time = self.elapsed_time
 
     def handler_confirm_upload(self):
         answer = askyesno(title='Confirm', message='Upload timesheet?')
@@ -108,9 +126,8 @@ class Timelog:
         self.save_button['state'] = tk.DISABLED
         self.upload_in_progress = 1
         # TODO: upload timesheet
-        print("Uploading file...")
         print(self.file)
-        self.saved_time_label.config(text="uploading...")
+        self.saved_time_label.config(text="uploading")
         self.upload_button.after(4000, self.handler_upload_complete)
 
     def handler_upload_complete(self):
