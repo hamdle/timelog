@@ -113,8 +113,14 @@ class Timelog:
             self.save_file(self.total_elapsed_time - self.last_saved_time)
             self.last_saved_time = self.total_elapsed_time
         if self.timer_on == True:
-            self.save_file(self.elapsed_time - self.last_saved_time)
-            self.last_saved_time = self.elapsed_time
+            # self.elapsed_time can update while saving the file
+            # but before setting self.last_saved_time causing an
+            # off-by-one error on the next save so we save it as
+            # a local variable so the value does not change
+            # during the save process.
+            time_past = self.elapsed_time
+            self.save_file(time_past - self.last_saved_time)
+            self.last_saved_time = time_past
 
     def handler_confirm_upload(self):
         answer = askyesno(title='Confirm', message='Upload timesheet?')
