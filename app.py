@@ -119,7 +119,7 @@ class Timelog:
             # a local variable so the value does not change
             # during the save process.
             time_past = self.elapsed_time
-            self.save_file(time_past - self.last_saved_time)
+            self.save_file(round(time_past - self.last_saved_time))
             self.last_saved_time = time_past
 
     def handler_confirm_upload(self):
