@@ -110,7 +110,7 @@ class Timelog:
     def handler_save_button_press(self):
         self.save_button['state'] = tk.DISABLED
         if self.timer_on == False:
-            self.save_file(self.total_elapsed_time - self.last_saved_time)
+            self.save_file(round(self.total_elapsed_time - self.last_saved_time))
             self.last_saved_time = self.total_elapsed_time
         if self.timer_on == True:
             # self.elapsed_time can update while saving the file
