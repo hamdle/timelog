@@ -20,6 +20,7 @@ class upload:
         self.url = config.get('Upload', 'Url')
         self.username = config.get('Upload', 'Username')
         self.password = config.get('Upload', 'Password')
+        self.tag = config.get('Upload', 'Tag')
 
 
     def sendTimesheet(self, timesheet):
@@ -27,11 +28,15 @@ class upload:
             self.authentiate()
             if self.token == "":
                 return False
-            self.send(timesheet)
-            return True
+            if self.send(timesheet):
+                return True
+            else:
+                return False
         else:
-            self.send(timesheet)
-            return True
+            if self.send(timesheet):
+                return True
+            else:
+                return False
         return False
 
     def authentiate(self):
@@ -63,6 +68,7 @@ class upload:
         self.data = {
             "timesheet": json.dumps(timesheet),
             "token": self.token,
+            "tag": self.tag,
             "method": "Timelog.timesheet",
         }
         try:
@@ -73,13 +79,23 @@ class upload:
         except Exception as ex:
             print("Error sending timelog...")
             print(ex.message)
+            return False
 
         try:
             print("Reading response...")
-            print(str(response.json()))
+            result = response.json()
+            print(str(result))
         except requests.JSONDecodeError:
             print("Error decoding response...")
             print(response.text)
+            return False
+
+        if result["error"] == "true":
+            print("Error uploading timesheet...")
+            print(result["message"])
+            return False
+
+        return True
 
 class setInterval :
     def __init__(self, interval, action) :
