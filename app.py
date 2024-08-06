@@ -7,6 +7,79 @@ import threading
 import datetime
 import configparser
 from tkinter.messagebox import askyesno
+import requests
+import json
+
+class upload:
+    def __init__(self):
+        self.token = ""
+        self.headers = {"Content-Type": "application/json"}
+
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+        self.url = config.get('Upload', 'Url')
+        self.username = config.get('Upload', 'Username')
+        self.password = config.get('Upload', 'Password')
+
+
+    def sendTimesheet(self, timesheet):
+        if self.token == "":
+            self.authentiate()
+            if self.token == "":
+                return False
+            self.send(timesheet)
+            return True
+        else:
+            self.send(timesheet)
+            return True
+        return False
+
+    def authentiate(self):
+        self.data = {
+            "email": self.username,
+            "password": self.password,
+            "method": "Auth.token",
+        }
+        try:
+            print("Sending auth request...")
+            print(self.url)
+            print(str(self.data))
+            response = requests.post(self.url, self.data, self.headers)
+        except Exception as ex:
+            print("Error sending timelog...")
+            print(ex.message)
+
+        try:
+            print("Reading response...")
+            raw = response.json()
+            print(str(response.json()))
+        except requests.JSONDecodeError:
+            print("Error decoding response...")
+            print(response.text)
+        self.token = raw["token"]
+        print(self.token)
+
+    def send(self, timesheet):
+        self.data = {
+            "timesheet": json.dumps(timesheet),
+            "token": self.token,
+            "method": "Timelog.timesheet",
+        }
+        try:
+            print("Sending timesheet...")
+            print(self.url)
+            print(str(self.data))
+            response = requests.post(self.url, self.data, self.headers)
+        except Exception as ex:
+            print("Error sending timelog...")
+            print(ex.message)
+
+        try:
+            print("Reading response...")
+            print(str(response.json()))
+        except requests.JSONDecodeError:
+            print("Error decoding response...")
+            print(response.text)
 
 class setInterval :
     def __init__(self, interval, action) :
@@ -86,6 +159,8 @@ class Timelog:
 
         self.root.tk.call('tk', 'scaling', 1.0)
 
+        self.upload = upload()
+
     def update_action(self, wait = False):
         if str(self.save_button['state']) == tk.DISABLED:
             self.save_button['state'] = tk.NORMAL
@@ -128,20 +203,31 @@ class Timelog:
             self.handler_upload_button_press()
 
     def handler_upload_button_press(self):
+        self.saved_time_label.config(text="uploading")
         self.upload_button['state'] = tk.DISABLED
         self.save_button['state'] = tk.DISABLED
         self.upload_in_progress = 1
-        # TODO: upload timesheet
+
+        self.file_lines = []
+        with open(self.file, "r") as f:
+            for line in f:
+                self.file_lines.append(line)
+
+        print(self.file_lines)
+        self.sendResult = self.upload.sendTimesheet(self.file_lines)
+
         print(self.file)
-        self.saved_time_label.config(text="uploading")
-        self.upload_button.after(4000, self.handler_upload_complete)
+        self.upload_button.after(100, self.handler_upload_complete)
 
     def handler_upload_complete(self):
         self.upload_button['state'] = tk.NORMAL
         self.save_button['state'] = tk.NORMAL
-        self.saved_time_label.config(text="error")
+        if self.sendResult:
+            self.saved_time_label.config(text="success")
+        else:
+            self.saved_time_label.config(text="error")
         self.upload_in_progress = 0
-        self.upload_button.after(2000, lambda: self.saved_time_label.config(text=""))
+        self.upload_button.after(6000, lambda: self.saved_time_label.config(text=""))
 
     def save_file(self, seconds_to_add):
         if self.upload_in_progress == 1:
