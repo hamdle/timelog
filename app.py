@@ -9,19 +9,17 @@ import configparser
 from tkinter.messagebox import askyesno
 import requests
 import json
+import os
 
 class upload:
-    def __init__(self):
+    def __init__(self, config):
         self.token = ""
         self.headers = {"Content-Type": "application/json"}
 
-        config = configparser.ConfigParser()
-        config.read('config.ini')
         self.url = config.get('Upload', 'Url')
         self.username = config.get('Upload', 'Username')
         self.password = config.get('Upload', 'Password')
         self.tag = config.get('Upload', 'Tag')
-
 
     def sendTimesheet(self, timesheet):
         if self.token == "":
@@ -124,7 +122,6 @@ class Timelog:
         self.last_saved_time = 0
         self.start_time = time.time()
 
-
         self.root = tk.Tk(className='timelogtk')
         self.root.geometry('300x420')
         self.root.resizable(False, False)
@@ -138,7 +135,9 @@ class Timelog:
         self.frame.grid()
         self.frame.pack(anchor='center')
 
-        self.logo = Image.open('logo.png')
+        dirname, filename = os.path.split(os.path.abspath(__file__))
+
+        self.logo = Image.open(dirname + '/logo.png')
         self.logo = self.logo.resize((50,50))
         self.logo_photo = ImageTk.PhotoImage(self.logo)
         self.logo_label = ttk.Label(self.frame, image=self.logo_photo)
@@ -160,7 +159,7 @@ class Timelog:
         # self.save_button.grid(column=0, row=4, pady=(27,0), padx=(30,0))
         self.save_button['state'] = tk.DISABLED
 
-        self.upload = Image.open('upload.png')
+        self.upload = Image.open(dirname + '/upload.png')
         self.upload = self.upload.resize((19, 19))
         self.upload_image = ImageTk.PhotoImage(self.upload)
         self.upload_button = ttk.Button(self.frame, image=self.upload_image, command=self.handler_confirm_upload)
@@ -169,13 +168,13 @@ class Timelog:
         self.upload_in_progress = 0
 
         config = configparser.ConfigParser()
-        config.read('config.ini')
+        config.read(dirname + '/config.ini')
         self.file = config.get('File', 'Location')
         self.file_lines = []
 
         self.root.tk.call('tk', 'scaling', 1.0)
 
-        self.upload = upload()
+        self.upload = upload(config)
 
     def update_action(self, wait = False):
         if str(self.save_button['state']) == tk.DISABLED:
